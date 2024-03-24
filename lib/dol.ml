@@ -1,7 +1,4 @@
 open Core
-open Async
-
-[@@@warning "-26"]
 
 let num_text_sections = 7
 let num_data_sections = 11
@@ -101,17 +98,4 @@ let dump t =
   |> List.iter ~f:(fun { contents; _ } -> Iobuf.Fill.stringo iobuf contents);
   Iobuf.flip_lo iobuf;
   Iobuf.to_string iobuf
-;;
-
-let command =
-  Command.async
-    ~summary:""
-    (let%map_open.Command in_file =
-       flag "-file" ~doc:"FILE dol file" (required Filename_unix.arg_type)
-     and out_file = flag "-out" ~doc:"FILE dol file" (required Filename_unix.arg_type) in
-     fun () ->
-       let%bind contents = Reader.file_contents in_file in
-       let contents = load contents |> dump in
-       assert (equal (load contents) (load (load contents |> dump)));
-       Writer.save out_file ~contents)
 ;;

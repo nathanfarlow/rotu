@@ -48,6 +48,38 @@ module Output = struct
     }
 end
 
+(* Either patch the iso or make an action replay code *)
+
+let make_ar_code ~chunk_base (output : Output.t) : string =
+  (* address, value *)
+  let string_writes =
+    let iobuf = Iobuf.of_string output.chunk in
+    let results = ref [] in
+    let address = ref chunk_base in
+    while not (Iobuf.is_empty iobuf) do
+      let value = Iobuf.Consume.uint32_be iobuf in
+      results := (!address, value) :: !results;
+      address := !address + 4
+    done;
+    !results
+  in
+  let explicit_writes =
+    List.map output.writes ~f:(fun { address; value } ->
+      match value with
+      | `Relative_branch_to_chunk_offset offset ->
+        let relative_address = chunk_base + offset - address in
+        assert (relative_address % 4 = 0);
+        assert (relative_address > 0);
+        assert (relative_address < 1 lsl 24);
+        let instruction = relative_address lor 0x48000000 in
+        address, instruction)
+  in
+  List.map (explicit_writes @ string_writes) ~f:(fun (address, value) ->
+    let address = address land 0x00FFFFFF in
+    sprintf "04%06X %08X" address value)
+  |> String.concat ~sep:"\n"
+;;
+
 let go input =
   let chunk, writes =
     List.fold_map

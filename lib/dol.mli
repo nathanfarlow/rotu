@@ -16,3 +16,4 @@ type t =
 
 val load : string -> t
 val dump : t -> string
+val read_virtual : t -> address:int -> size:int -> string option

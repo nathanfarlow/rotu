@@ -99,3 +99,16 @@ let dump t =
   Iobuf.flip_lo iobuf;
   Iobuf.to_string iobuf
 ;;
+
+let read_virtual t ~address ~size =
+  let read section =
+    let { address = section_address; contents } = section in
+    if address >= section_address
+       && address + size <= section_address + String.length contents
+    then (
+      let offset = address - section_address in
+      Some (String.sub contents ~pos:offset ~len:size))
+    else None
+  in
+  List.find_map t.text ~f:read
+;;

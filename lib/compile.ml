@@ -1,4 +1,5 @@
 open Core
+open Async
 
 module Input = struct
   module Symbol = struct
@@ -13,6 +14,7 @@ module Input = struct
       { address : int
       ; function_name : string
       }
+    [@@deriving sexp]
   end
 
   type t =
@@ -104,6 +106,24 @@ let go input =
   Output.{ chunk; writes }
 ;;
 
+let input_of_world ~elf_file ~bin_file ~dol_file ~hook_file =
+  let%bind chunk = Reader.file_contents bin_file
+  and dol = Reader.file_contents dol_file >>| Dol.load in
+  let%map symbols =
+    Process.run_lines_exn ~prog:"nm" ~args:[ "-S"; elf_file ] ()
+    >>| List.filter_map ~f:(fun line ->
+      match String.split line ~on:' ' with
+      | [ address; size; _; symbol ] ->
+        let offset = Int.of_string ("0x" ^ address) in
+        let size = Int.of_string ("0x" ^ size) in
+        Some (symbol, Input.Symbol.{ offset; size })
+      | _ -> None)
+    >>| Map.of_alist_exn (module String)
+  in
+  let hooks = Sexp.load_sexp hook_file |> [%of_sexp: Input.Hook.t list] in
+  Input.{ dol; chunk; symbols; hooks }
+;;
+
 let%expect_test "test action replay" =
   let _output =
     Output.
@@ -116,5 +136,32 @@ let%expect_test "test action replay" =
   [%expect {|
     04000010 4B0FFFF0
     04100004 42424242
-    04100000 41414141 |}]
+    04100000 41414141 |}];
+  return ()
+;;
+
+let%expect_test _ =
+  let hook = Input.Hook.{ address = 0x80000000; function_name = "test" } in
+  print_s [%sexp (hook : Input.Hook.t)];
+  [%expect {| ((address 2147483648) (function_name test)) |}];
+  return ()
+;;
+
+let command =
+  Command.async
+    ~summary:""
+    (let%map_open.Command elf_file =
+       flag "-elf-file" ~doc:"FILE elf file" (required Filename_unix.arg_type)
+     and bin_file =
+       flag "-bin-file" ~doc:"FILE bin file" (required Filename_unix.arg_type)
+     and dol_file =
+       flag "-dol-file" ~doc:"FILE dol file" (required Filename_unix.arg_type)
+     and hook_file =
+       flag "-hook-file" ~doc:"FILE hook file" (required Filename_unix.arg_type)
+     and chunk_base = flag "-chunk-base" ~doc:"INT chunk base" (required int) in
+     fun () ->
+       input_of_world ~elf_file ~bin_file ~dol_file ~hook_file
+       >>| go
+       >>| make_ar_code ~chunk_base
+       >>| print_endline)
 ;;

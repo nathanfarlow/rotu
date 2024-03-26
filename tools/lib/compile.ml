@@ -143,7 +143,7 @@ let go input =
   Output.{ chunk; writes }
 ;;
 
-let input_of_world ~elf_file ~bin_file ~dol_file ~hook_file =
+let input_of_world ~elf_file ~bin_file ~dol_file ~hook_file ~chunk_base =
   let%bind chunk = Reader.file_contents bin_file
   and dol = Reader.file_contents dol_file >>| Dol.load in
   let%map symbols =
@@ -151,7 +151,7 @@ let input_of_world ~elf_file ~bin_file ~dol_file ~hook_file =
     >>| List.filter_map ~f:(fun line ->
       match String.split line ~on:' ' with
       | [ address; size; _; symbol ] ->
-        let offset = Int.of_string ("0x" ^ address) in
+        let offset = Int.of_string ("0x" ^ address) - chunk_base in
         let size = Int.of_string ("0x" ^ size) in
         Some (symbol, Input.Symbol.{ offset; size })
       | _ -> None)
@@ -190,7 +190,7 @@ let command =
        flag "-hook-file" ~doc:"FILE hook file" (required Filename_unix.arg_type)
      and chunk_base = flag "-chunk-base" ~doc:"INT chunk base" (required int) in
      fun () ->
-       input_of_world ~elf_file ~bin_file ~dol_file ~hook_file
+       input_of_world ~elf_file ~bin_file ~dol_file ~hook_file ~chunk_base
        >>| go
        >>| make_ar_code ~chunk_base
        >>| print_endline)

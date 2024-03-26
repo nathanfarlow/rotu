@@ -52,6 +52,24 @@ end
 
 (* Either patch the iso or make an action replay code *)
 
+let make_b ~from ~to_ =
+  let relative_offset = to_ - from in
+  assert (relative_offset % 4 = 0);
+  assert (relative_offset >= -(1 lsl 23) && relative_offset < 1 lsl 23);
+  let relative_offset =
+    if relative_offset < 0 then relative_offset + (1 lsl 24) else relative_offset
+  in
+  0x48000000 lor relative_offset
+;;
+
+let make_bl ~from ~to_ = make_b ~from ~to_ lor 1
+
+let int_to_string i =
+  let buf = Bigstring.create 4 in
+  Bigstring.set_uint32_be_exn buf ~pos:0 i;
+  Bigstring.to_string buf
+;;
+
 let make_ar_code ~chunk_base (output : Output.t) : string =
   (* address, value *)
   let string_writes =
@@ -70,13 +88,7 @@ let make_ar_code ~chunk_base (output : Output.t) : string =
     List.map output.writes ~f:(fun { address; value } ->
       match value with
       | `Relative_branch_to_chunk_offset offset ->
-        let relative_address = chunk_base + offset - address in
-        assert (relative_address % 4 = 0);
-        assert (relative_address >= -(1 lsl 23) && relative_address < 1 lsl 23);
-        let relative_address =
-          if relative_address < 0 then relative_address + (1 lsl 24) else relative_address
-        in
-        let instruction = relative_address lor 0x4b000000 in
+        let instruction = make_bl ~from:address ~to_:(chunk_base + offset) in
         address, instruction)
   in
   List.map (explicit_writes @ string_writes) ~f:(fun (address, value) ->
@@ -91,15 +103,23 @@ let go input =
       input.Input.hooks
       ~init:input.chunk
       ~f:(fun chunk { address; function_name } ->
+        let hook_offset = Input.hook_offset input function_name in
+        let bootstrap_offset = String.length chunk in
         let chunk_addition =
           let instruction =
             Dol.read_virtual input.dol ~address ~size:4 |> Option.value_exn
           in
           let save_state = Input.read_from_chunk input "save_state" in
+          let b =
+            make_b
+              ~from:(bootstrap_offset + 4 + String.length save_state)
+              ~to_:hook_offset
+            |> int_to_string
+          in
           let restore_state = Input.read_from_chunk input "restore_state" in
-          save_state ^ instruction ^ restore_state
+          let blr = int_to_string 0x4E800020 in
+          save_state ^ b ^ restore_state ^ instruction ^ blr
         in
-        let hook_offset = Input.hook_offset input function_name in
         let value = `Relative_branch_to_chunk_offset hook_offset in
         chunk ^ chunk_addition, Output.Write.{ address; value })
   in
@@ -134,16 +154,9 @@ let%expect_test "test action replay" =
   let codes = make_ar_code ~chunk_base:0x80100000 _output in
   print_endline codes;
   [%expect {|
-    04000010 4B0FFFF0
+    04000010 480FFFF1
     04100004 42424242
     04100000 41414141 |}];
-  return ()
-;;
-
-let%expect_test _ =
-  let hook = Input.Hook.{ address = 0x80000000; function_name = "test" } in
-  print_s [%sexp (hook : Input.Hook.t)];
-  [%expect {| ((address 2147483648) (function_name test)) |}];
   return ()
 ;;
 

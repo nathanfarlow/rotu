@@ -55,14 +55,31 @@ end
 let make_b ~from ~to_ =
   let relative_offset = to_ - from in
   assert (relative_offset % 4 = 0);
+  let relative_offset = relative_offset / 4 in
   assert (relative_offset >= -(1 lsl 23) && relative_offset < 1 lsl 23);
   let relative_offset =
     if relative_offset < 0 then relative_offset + (1 lsl 24) else relative_offset
   in
-  0x48000000 lor relative_offset
+  let op_mask = 0b10010 lsl 26 in
+  let link_mask = 1 in
+  op_mask lor (relative_offset lsl 2) lor link_mask
 ;;
 
 let make_bl ~from ~to_ = make_b ~from ~to_ lor 1
+
+let%expect_test "bl forward" =
+  let instruction = make_bl ~from:0x80000000 ~to_:0x80000008 in
+  print_endline (Printf.sprintf "0x%08X" instruction);
+  [%expect {| 0x48000009 |}];
+  return ()
+;;
+
+let%expect_test "bl backward" =
+  let instruction = make_bl ~from:0x80000010 ~to_:0x80000000 in
+  print_endline (Printf.sprintf "0x%08X" instruction);
+  [%expect {| 0x4BFFFFF1 |}];
+  return ()
+;;
 
 let int_to_string i =
   let buf = Bigstring.create 4 in
@@ -106,21 +123,21 @@ let go input =
         let hook_offset = Input.hook_offset input function_name in
         let bootstrap_offset = String.length chunk in
         let chunk_addition =
-          let instruction =
-            Dol.read_virtual input.dol ~address ~size:4 |> Option.value_exn
-          in
-          let save_state = Input.read_from_chunk input "save_state" in
-          let b =
-            make_b
-              ~from:(bootstrap_offset + 4 + String.length save_state)
+          let save_registers = Input.read_from_chunk input "save_registers" in
+          let bl =
+            make_bl
+              ~from:(bootstrap_offset + String.length save_registers)
               ~to_:hook_offset
             |> int_to_string
           in
-          let restore_state = Input.read_from_chunk input "restore_state" in
+          let restore_registers = Input.read_from_chunk input "restore_registers" in
+          let instruction =
+            Dol.read_virtual input.dol ~address ~size:4 |> Option.value_exn
+          in
           let blr = int_to_string 0x4E800020 in
-          save_state ^ b ^ restore_state ^ instruction ^ blr
+          save_registers ^ bl ^ restore_registers ^ instruction ^ blr
         in
-        let value = `Relative_branch_to_chunk_offset hook_offset in
+        let value = `Relative_branch_to_chunk_offset bootstrap_offset in
         chunk ^ chunk_addition, Output.Write.{ address; value })
   in
   Output.{ chunk; writes }

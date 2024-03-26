@@ -1,0 +1,19 @@
+stack base = end of text = 803f7214
+
+;; use 803266d0
+
+_StackBase = 0x803f7214;
+_StackSize = 0x8004;
+
+heap start = 80424a20
+heap end = 803ecd48
+
+start of code = 0x80003100
+
+0x80003F00	0x132c100 (~19.2MB)		Standard application executable area
+
+// MAIN_.text0 // ram:80003100-ram:800055ff 
+
+MAIN_.text1	80005840	802c445f	0x2bec20	true	true	true	false		Default	true			
+
+https://www.bsfree.org/hack/hacking_gcn.html#ar_code_types

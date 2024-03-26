@@ -39,7 +39,13 @@ let header_of_mappings (mappings : Mapping.t list) =
 ;;
 
 let header_of_contents contents =
-  String.split_lines contents |> List.map ~f:mapping_of_line |> header_of_mappings
+  String.split_lines contents
+  |> List.map ~f:mapping_of_line
+  |> List.dedup_and_sort
+       ~compare:
+         (Comparable.lift String.compare ~f:(fun Mapping.{ name; namespace; _ } ->
+            namespace ^ name))
+  |> header_of_mappings
 ;;
 
 let command =

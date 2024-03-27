@@ -82,9 +82,15 @@ save_registers:
   mffs 0
   stfd 0, 0x188(1)
 
+# jank broken compiler workaround?
+  stwu 1, -0x800(1)
+
 .size save_registers, .-save_registers
 
 restore_registers:
+
+  addi 1, 1, 0x800
+
   lwz 0, 0x178(1)
   mtlr 0
   lwz 0, 0x17c(1)

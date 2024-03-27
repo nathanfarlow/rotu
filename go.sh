@@ -1,9 +1,9 @@
 #!/bin/bash
-set -euox pipefail
+set -euo pipefail
 
 cd "$(dirname "$0")"
 cd mod
-make
+make >&2
 cd ../tools
 dune build
 
@@ -14,7 +14,7 @@ AR="$(dune exec bin/main.exe -- \
      -bin-file ../mod/payload.bin \
      -hook-file ../mod/hooks.sexp \
      -dol-file ../data/extract/sys/main.dol \
-     -chunk-base 0x80f5c400)"
+     -chunk-base 0x801cbcbc | shuf)"
 
 name=$(uuid)
 
@@ -24,6 +24,8 @@ echo -e "[ActionReplay_Enabled]
 \$$name
 $AR" > ~/.local/share/dolphin-emu/GameSettings/GIQE78.ini
 
-echo "$AR" | wc -l
+echo "$AR"
+printf "Lines: %d\n" $(echo "$AR" | wc -l) >&2
+
 
 dolphin-emu -d -e ../data/iso/*Underminer*.iso

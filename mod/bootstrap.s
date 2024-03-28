@@ -5,7 +5,7 @@
 _start:
 save_registers:
   stwu 1, -0x200(1)
-# gprs
+
   stw 0, 0x00(1)
   stw 2, 0x04(1)
   stw 3, 0x08(1)
@@ -37,7 +37,7 @@ save_registers:
   stw 29, 0x70(1)
   stw 30, 0x74(1)
   stw 31, 0x78(1)
-# floats
+
   stfd 0, 0x7c(1)
   stfd 1, 0x84(1)
   stfd 2, 0x8c(1)
@@ -70,7 +70,7 @@ save_registers:
   stfd 29, 0x164(1)
   stfd 30, 0x16c(1)
   stfd 31, 0x174(1)
-# special regs
+
   mflr 0
   stw 0, 0x178(1)
   mfctr 0
@@ -82,14 +82,14 @@ save_registers:
   mffs 0
   stfd 0, 0x188(1)
 
-# jank broken compiler workaround?
-  stwu 1, -0x800(1)
+# compiler generated code tries to write 4 bytes into my stack frame?
+  stwu 1, -0x20(1)
 
 .size save_registers, .-save_registers
 
 restore_registers:
 
-  addi 1, 1, 0x800
+  addi 1, 1, 0x20
 
   lwz 0, 0x178(1)
   mtlr 0

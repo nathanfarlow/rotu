@@ -7,7 +7,7 @@ make >&2
 cd ../tools
 dune build
 
-dune exec bin/main.exe -- make-header -map-file ../data/test.map > ../mod/symbols.h
+# dune exec bin/main.exe -- make-header -map-file ../data/test.map > ../mod/symbols.h
 
 AR="$(dune exec bin/main.exe -- \
      make-ar -elf-file ../mod/payload.elf \
@@ -27,5 +27,4 @@ $AR" > ~/.local/share/dolphin-emu/GameSettings/GIQE78.ini
 echo "$AR"
 printf "Lines: %d\n" $(echo "$AR" | wc -l) >&2
 
-
-dolphin-emu -d -e ../data/iso/*Underminer*.iso
+dolphin-emu -d -e ../data/iso/*.iso

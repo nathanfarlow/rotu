@@ -14,7 +14,7 @@ AR="$(dune exec bin/main.exe -- \
      -bin-file ../mod/payload.bin \
      -hook-file ../mod/hooks.sexp \
      -dol-file ../data/extract/sys/main.dol \
-     -chunk-base 0x801cbcbc | shuf)"
+     -chunk-base 0x801c6254 | shuf)"
 
 name=$(uuid)
 

@@ -7,7 +7,7 @@
 
 #define CHEAT_EGO_PROBLEM 8
 
-/** Make the head scale thing go */
+/** They really be vibing */
 void scale_head() {
   *gCheats |= CHEAT_EGO_PROBLEM;
 

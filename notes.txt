@@ -17,3 +17,34 @@ start of code = 0x80003100
 MAIN_.text1	80005840	802c445f	0x2bec20	true	true	true	false		Default	true			
 
 https://www.bsfree.org/hack/hacking_gcn.html#ar_code_types
+
+/* __thiscall zNPCMgr::NPCProjectileCollisionOnAll(void) */
+
+void __thiscall zNPCMgr::NPCProjectileCollisionOnAll(zNPCMgr *this)
+
+{
+  byte extraout_var;
+  zNPCInstance *this_00;
+  int iVar1;
+  char cVar2;
+  int iVar3;
+  en_npctyp local_24;
+  
+  for (local_24 = 0; (int)local_24 < 0xc; local_24 = local_24 + 1) {
+    iVar3 = 0;
+    while( true ) {
+      if (*(int *)(this + local_24 * 4 + 0x1d0) <= iVar3) break;
+      this_00 = (zNPCInstance *)GetInstance(this,local_24,iVar3);
+      iVar1 = zNPC::zNPCInstance::get_data(this_00);
+      if (iVar1 != 0) {
+        zNPC::zNPCInstance::get_flags(this_00);
+        if (((extraout_var >> 6 & 1) != 0) &&
+           (cVar2 = zNPC::zNPCInstance::ShouldHaveData(this_00), cVar2 != '\0')) {
+          (**(code **)(*(int *)(iVar1 + 0xdc) + 100))(iVar1);
+        }
+      }
+      iVar3 = iVar3 + 1;
+    }
+  }
+  return;
+}

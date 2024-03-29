@@ -37,8 +37,6 @@ void (*render_text)(char *text, char unk) = (void (*)(char *, char))0x80075988;
 float nscreeny(float y) { return y * 0.0020833334; }
 float nscreenx(float x) { return x * 0.0015625; }
 
-u32 (*_strlen)(char *str) = (u32(*)(char *))0x802af4f8;
-
 void draw_text(char *text, float x, float y, float scale, u32 foreground_color,
                u32 shadow_color) {
   char font[0x100];

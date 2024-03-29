@@ -31,11 +31,11 @@ void (*render_text)(char *text, char unk) = (void (*)(char *, char))0x80075988;
 float nscreeny(float y) { return y * 0.0020833334; }
 float nscreenx(float x) { return x * 0.0015625; }
 
-void draw_text(char *text, float x, float y, float scale, u32 color) {
+void draw_text(char *text, float x, float y, float scale, u32 foreground_color,
+               u32 background_color) {
   char font[0x200];
-  u32 black = 0;
-  xfont_create((xfont *)font, 0, nscreenx(x), nscreeny(y), 0.0f, &color,
-               screen_bounds, &black, 2., 2.);
+  xfont_create((xfont *)font, 0, nscreenx(x), nscreeny(y), 0.0f,
+               &foreground_color, screen_bounds, &background_color, 2., 2.);
 
   char textbox[0x200];
   xtextbox_create((xtextbox *)textbox, (xfont *)font, screen_bounds, 2, 0, 0, 0,

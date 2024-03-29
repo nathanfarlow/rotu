@@ -1,9 +1,6 @@
 #include "mods.h"
 #include "text.h"
 
-/* void (*draw_demo)(float) = (void (*)(float))0x800bbc88; */
-#define guh_text ((volatile char **)0x803ed55c)
-
 /** Gets called at the start of while loop in void Global::zGameLoop(void)
  */
 void game_loop_hook() {

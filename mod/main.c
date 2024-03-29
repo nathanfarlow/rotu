@@ -11,7 +11,8 @@ void game_loop_hook() {
 
 /* #define mr_i_can_take_damage ((volatile void **)0x802ff93c) */
 
-/* char no() { return 0; } */
+char no() { return 0; }
+char yes() { return 1; }
 
 #define zNPCMgr void
 #define zNPCBase void
@@ -37,21 +38,24 @@ typedef struct xVec3 {
 
 xVec3 *(*get_last_pos)(zNPCInstance *npc_instance) = (void *)0x800bd09c;
 
+void (*SetChase)(zNPCInstance *npc_instance, char b) = (void *)0x800cf158;
+void (*SetAttack)(zNPCInstance *npc_instance, char b) = (void *)0x800cf150;
+
 void iter_npcs(zNPCMgr *this) {
   if (this == NULL)
     return;
 
   for (u32 npc_type = 0; npc_type < 0xc; npc_type = npc_type + 1) {
-    int i = 0;
     // Length check for current npc type
-    while (i < *(int *)(this + npc_type * 4 + 0x170)) {
+    for (int i = 0; i < *(int *)(this + npc_type * 4 + 0x170); i++) {
       zNPCBase *npc_base = GetData(this, npc_type, i);
       zNPCInstance *npc_instance = get_instance(npc_base);
-      // TODO: might have to check if has data is true
-      xVec3 *pos = get_last_pos(npc_instance);
-      dbgf("NPC %d: %f %f %f", i, pos->x, pos->y, pos->z);
-      return;
-      i = i + 1;
+
+      // might be orientation?
+      /* xVec3 *pos = (xVec3 *)((char *)npc_instance + 0x30); */
+
+      SetChase(npc_instance, 0);
+      SetAttack(npc_instance, 0);
     }
   }
 }

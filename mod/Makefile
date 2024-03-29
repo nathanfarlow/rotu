@@ -9,7 +9,7 @@ MODS = -DHEAD_MOD
 bootstrap.o: bootstrap.s
 	$(AS) -o bootstrap.o bootstrap.s
 
-payload.elf: main.c bootstrap.o linker.ld
+payload.elf: main.c head_mod.c text.c bootstrap.o linker.ld
 	$(CC) $(FLAGS) $(MODS) -Werror -O2 -g main.c head_mod.c text.c bootstrap.o -o payload.elf -Wall -T linker.ld -Wl,-Map,output.map,-Bstatic
 
 payload.bin: payload.elf

@@ -9,6 +9,4 @@ void game_loop_hook() {
 #endif
 }
 
-void end_of_render() {
-  draw_text("Hello, World!", 19.0f, 22.0f, 2.0f, 0xFFE600FF);
-}
+void end_of_render() { draw_text("yuh", 19.0f, 22.0f, 2.0f, 0xFFE600FF, 0x0); }

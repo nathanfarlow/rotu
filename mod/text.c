@@ -19,8 +19,9 @@ void (*xfont_create)(xfont *font, u32 unk, float xscale, float yscale,
                                                     u32 *))0x80013604;
 
 void (*xtextbox_create)(xtextbox *textbox, xfont *font, basic_rect *rect,
-                        u32 a) = (void (*)(xtextbox *, xfont *, basic_rect *,
-                                           u32))0x800134c4;
+                        u32 centering) = (void (*)(xtextbox *, xfont *,
+                                                   basic_rect *,
+                                                   u32))0x800134c4;
 
 void (*xtextbox_set_text)(xtextbox *textbox,
                           char *text) = (void (*)(xtextbox *,
@@ -36,13 +37,7 @@ void (*render_text)(char *text, char unk) = (void (*)(char *, char))0x80075988;
 float nscreeny(float y) { return y * 0.0020833334; }
 float nscreenx(float x) { return x * 0.0015625; }
 
-int strlen(char *str) {
-  int i = 0;
-  while (str[i] != '\0') {
-    i++;
-  }
-  return i;
-}
+u32 (*_strlen)(char *str) = (u32(*)(char *))0x802af4f8;
 
 void draw_text(char *text, float x, float y, float scale, u32 foreground_color,
                u32 shadow_color) {
@@ -51,13 +46,16 @@ void draw_text(char *text, float x, float y, float scale, u32 foreground_color,
   float xscale = nscreenx(22.) * scale;
   float yscale = nscreeny(19.) * scale;
 
-  basic_rect foo = {x, y, xscale * strlen(text), yscale};
+  x -= xscale * _strlen(text) / 2;
+  y -= yscale / 2;
+
+  basic_rect foo = {x, y, xscale * _strlen(text), yscale};
 
   xfont_create((xfont *)font, NULL, xscale, yscale, 0, &foreground_color,
                screen_bounds, &shadow_color);
 
   char textbox[0x100];
-  xtextbox_create((xtextbox *)textbox, (xfont *)font, &foo, 0);
+  xtextbox_create((xtextbox *)textbox, (xfont *)font, &foo, 10);
 
   xtextbox_set_text((xtextbox *)textbox, text);
   textbox_render((xtextbox *)textbox, 1);

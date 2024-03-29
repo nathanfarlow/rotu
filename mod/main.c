@@ -11,8 +11,9 @@ void game_loop_hook() {
 
 void end_of_render() {
 
-  float x = sinf(*gFrameCount * 0.1) * 0.5 + 0.5;
-  float y = cosf(*gFrameCount * 0.1) * 0.5 + 0.5;
+  float x = sinf(*gFrameCount * 0.01) * 0.5 + 0.5;
+  float y = cosf(*gFrameCount * 0.01) * 0.5 + 0.5;
+  int color = sinf(*gFrameCount * 0.1) * 0xFF;
 
-  draw_text("yuh", x, y, 1.0f, 0xFFE600FF, 0x0);
+  draw_text("yeet", x, y, 4.0f, (color << 24 | 0x00FFFF), 0x0);
 }

@@ -11,11 +11,9 @@ void (*xfont_create)(xfont *font, u32 unk, float x, float y, float unk1,
                                              u32 *, basic_rect *, u32 *, float,
                                              float))0x80013604;
 
-void (*xtextbox_create)(xtextbox *textbox, xfont *font, basic_rect *rect, u32 a,
-                        float b, float c, float d,
-                        float e) = (void (*)(xtextbox *, xfont *, basic_rect *,
-                                             u32, float, float, float,
-                                             float))0x800134c4;
+void (*xtextbox_create)(xtextbox *textbox, xfont *font, basic_rect *rect,
+                        u32 a) = (void (*)(xtextbox *, xfont *, basic_rect *,
+                                           u32))0x800134c4;
 
 void (*xtextbox_set_text)(xtextbox *textbox,
                           char *text) = (void (*)(xtextbox *,
@@ -34,12 +32,15 @@ float nscreenx(float x) { return x * 0.0015625; }
 void draw_text(char *text, float x, float y, float scale, u32 foreground_color,
                u32 background_color) {
   char font[0x100];
-  xfont_create((xfont *)font, 0, nscreenx(x), nscreeny(y), 0.,
-               &foreground_color, screen_bounds, &background_color, 2., 2.);
+  float distance_between_characters = 0;
+  xfont_create((xfont *)font, NULL, nscreenx(x), nscreeny(y),
+               distance_between_characters, &foreground_color, screen_bounds,
+               &background_color, 0.1, 0.3);
 
   char textbox[0x100];
-  xtextbox_create((xtextbox *)textbox, (xfont *)font, screen_bounds, 2, 0, 0, 0,
-                  0);
+  u32 centering = 2;
+  /* float value = sinf(*gFrameCount * 0.1) * 0.5 + 0.5; */
+  xtextbox_create((xtextbox *)textbox, (xfont *)font, screen_bounds, centering);
 
   xtextbox_set_text((xtextbox *)textbox, text);
   textbox_render((xtextbox *)textbox, 1);

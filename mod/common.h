@@ -1,5 +1,6 @@
 #pragma once
 
+#define NULL 0
 #define u32 unsigned int
 
 #define sinf ((float (*)(float))0x8007d7f0)

@@ -10,7 +10,7 @@ bootstrap.o: bootstrap.s
 	$(AS) -o bootstrap.o bootstrap.s
 
 payload.elf: main.c bootstrap.o linker.ld
-	$(CC) $(FLAGS) $(MODS) -Werror -O2 -g main.c head_mod.c bootstrap.o -o payload.elf -Wall -T linker.ld -Wl,-Map,output.map,-Bstatic
+	$(CC) $(FLAGS) $(MODS) -Werror -O2 -g main.c head_mod.c text.c bootstrap.o -o payload.elf -Wall -T linker.ld -Wl,-Map,output.map,-Bstatic
 
 payload.bin: payload.elf
 	$(OBJCOPY) -O binary payload.elf payload.bin

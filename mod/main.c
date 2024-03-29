@@ -1,10 +1,8 @@
 #include "mods.h"
-#include "symbols.h"
+#include "text.h"
 
-/* 0x800bbc88 */
-// declare a void function at this address
-void (*draw_demo)(float) = (void (*)(float))0x800bbc88;
-#define text ((volatile char **)0x803ed55c)
+/* void (*draw_demo)(float) = (void (*)(float))0x800bbc88; */
+#define guh_text ((volatile char **)0x803ed55c)
 
 /** Gets called at the start of while loop in void Global::zGameLoop(void)
  */
@@ -15,8 +13,5 @@ void game_loop_hook() {
 }
 
 void end_of_render() {
-  int N = 120;
-  float value = (float)((*gFrameCount) % N) / N;
-  *text = "Hello, World!";
-  draw_demo(value);
+  draw_text("Hello, World!", 19.0f, 22.0f, 2.0f, 0xFFE600FF);
 }

@@ -1,6 +1,6 @@
 #ifdef HEAD_MOD
 
-#include "symbols.h"
+#include "common.h"
 
 #define head_scale ((volatile float *)0x803e9ab8)
 #define other_head_scale ((volatile float *)0x803f108c)

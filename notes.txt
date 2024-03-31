@@ -48,3 +48,13 @@ void __thiscall zNPCMgr::NPCProjectileCollisionOnAll(zNPCMgr *this)
   }
   return;
 }
+
+npc enforcer = big guy with swingy arms
+
+SceneTimestep -> zNPCComon::timestep looks important
+
+type 1 is scooper guy.
+type 2 is enforcer
+type 3 is chimken
+
+type 5 is ground shooter guy

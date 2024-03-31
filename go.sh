@@ -24,6 +24,7 @@ echo -e "[ActionReplay_Enabled]
 \$$name
 $AR" > ~/.local/share/dolphin-emu/GameSettings/GIQE78.ini
 
+echo "$AR" > /tmp/mod.txt
 echo "$AR"
 printf "Lines: %d\n" $(echo "$AR" | wc -l) >&2
 

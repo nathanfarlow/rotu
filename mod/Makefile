@@ -4,13 +4,13 @@ all: payload.bin
 
 FLAGS	=	-DGEKKO -mcall-sysv -mcpu=750 -meabi -mhard-float
 
-MODS = -DHEAD_MOD
+# MODS = -DHEAD_MOD
 
 bootstrap.o: bootstrap.s
 	$(AS) -o bootstrap.o bootstrap.s
 
-payload.elf: main.c head_mod.c text.c npc.c bootstrap.o linker.ld
-	$(CC) $(FLAGS) $(MODS) -Werror -O2 -g main.c head_mod.c text.c npc.c bootstrap.o -o payload.elf -Wall -T linker.ld -Wl,-Map,output.map,-Bstatic
+payload.elf: main.c head_mod.c text.c npc.c common.c bootstrap.o linker.ld
+	$(CC) $(FLAGS) $(MODS) -Werror -O2 -g main.c head_mod.c text.c npc.c common.c bootstrap.o -o payload.elf -Wall -T linker.ld -Wl,-Map,output.map,-Bstatic
 
 payload.bin: payload.elf
 	$(OBJCOPY) -O binary payload.elf payload.bin

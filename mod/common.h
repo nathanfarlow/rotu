@@ -25,3 +25,9 @@ typedef struct xVec3 {
   float y;
   float z;
 } xVec3;
+
+/** offset1: bytes from start of objects
+ * offset2: words from start of vtable
+ */
+void *vtable(void *obj, int offset1, int offset2);
+void set_vtable(void *obj, int offset1, int offset2, void *func);

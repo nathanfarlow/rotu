@@ -10,9 +10,16 @@ void game_loop_hook() {
 #endif
 }
 
+/** offset1: bytes from start of objects
+ * offset2: words from start of vtable
+ */
+void *vtable(zNPCCommon *obj, int offset1, int offset2) {
+  return (*(void ***)(obj + offset1))[offset2];
+}
+
 void kill_npc(zNPCInstance *a, zNPCCommon *npc) {
-  void (*kill)(zNPCCommon *) = (void *)*(int *)(*(int *)(npc + 0xdc) + 0x54);
+  void (*kill)(zNPCCommon *) = vtable(npc, 0xdc, 0x15);
   kill(npc);
 }
 
-void end_of_render() { iter_npcs(kill_npc); }
+void end_of_render() { iter_npcs(*kill_npc); }

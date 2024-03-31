@@ -36,9 +36,12 @@ void draw_marker(zNPCInstance *a, zNPCCommon *npc) {
 
   float scale = f * 10;
 
-  float percent = GetHealthPercent(npc);
+  short cur_hp = get_cur_hp(npc);
+  short max_hp = get_max_hp(npc);
+
+  float percent = (float)cur_hp / max_hp;
   char buf[100];
-  _sprintf(buf, "%d", (int)(percent * 100));
+  _sprintf(buf, "%d/%d", cur_hp, max_hp);
 
   unsigned int red = (unsigned int)(255 * (1 - percent));
   unsigned int green = (unsigned int)(255 * percent);

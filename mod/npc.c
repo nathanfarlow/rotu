@@ -36,3 +36,19 @@ void iter_npcs(void (*f)(zNPCInstance *, zNPCCommon *)) {
 bool should_have_data(zNPCInstance *a, zNPCCommon *b) {
   return ShouldHaveData(a) && b != NULL;
 }
+
+void *(*get_combat)(zNPCCommon *) = (void *)0x80112808;
+
+short get_cur_hp(zNPCCommon *npc) {
+  void *combat = get_combat(npc);
+  if (combat == NULL)
+    return 1;
+  return *(short *)(combat + 0x1c);
+}
+
+short get_max_hp(zNPCCommon *npc) {
+  void *combat = get_combat(npc);
+  if (combat == NULL)
+    return 1;
+  return *(short *)(combat + 0x1e);
+}

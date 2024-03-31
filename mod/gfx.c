@@ -1,4 +1,20 @@
-#include "text.h"
+#include "gfx.h"
+
+// ------ world to screen
+typedef float mat4[4][4];
+// position is x + 0x30
+mat4 **cam = (void *)0x80398318;
+mat4 **cam_screen = (void *)0x8039831c;
+
+#define xCamScreen void
+xCamScreen **x_cam_screen_instance = (void *)0x8039831c;
+float (*world_to_screen_)(xCamScreen *, xVec3 *, xVec3 *) = (void *)0x8000d570;
+
+float world_to_screen(xVec3 *dst, xVec3 *src) {
+  return world_to_screen_(*x_cam_screen_instance, dst, src);
+}
+
+// ------ text drawing
 
 #define xfont void
 

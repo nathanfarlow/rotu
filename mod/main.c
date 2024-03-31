@@ -24,4 +24,18 @@ void game_loop_hook() {
 #endif
 }
 
-void end_of_render() {}
+xVec3 *(*xEntGetPos)(zNPCCommon *) = (void *)0x80025424;
+
+bool did = 0;
+void draw_hi(zNPCInstance *a, zNPCCommon *npc) {
+  if (did)
+    return;
+  xVec3 *v = xEntGetPos(npc);
+  dbgf("%f %f %f\n", v->x, v->y, v->z);
+  did = 1;
+}
+
+void end_of_render() {
+  did = 0;
+  iter_npcs(draw_hi);
+}

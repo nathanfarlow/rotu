@@ -25,6 +25,7 @@ void game_loop_hook() {
 }
 
 xVec3 *(*xEntGetPos)(zNPCCommon *) = (void *)0x80025424;
+float (*GetHealthPercent)(zNPCCommon *) = (void *)0x80116a9c;
 
 void draw_marker(zNPCInstance *a, zNPCCommon *npc) {
   xVec3 *v = xEntGetPos(npc);
@@ -35,7 +36,15 @@ void draw_marker(zNPCInstance *a, zNPCCommon *npc) {
 
   float scale = f * 10;
 
-  draw_text("X", screen.x, screen.y, scale, 0xFF00FFFF, 0);
+  float percent = GetHealthPercent(npc);
+  char buf[100];
+  _sprintf(buf, "%d", (int)(percent * 100));
+
+  unsigned int red = (unsigned int)(255 * (1 - percent));
+  unsigned int green = (unsigned int)(255 * percent);
+  unsigned int color = (red << 24) | (green << 16) | 0xff;
+
+  draw_text(buf, screen.x, screen.y, scale, color, 0);
 }
 
 void end_of_render() { iter_npcs(draw_marker); }

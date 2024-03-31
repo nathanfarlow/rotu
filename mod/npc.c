@@ -25,13 +25,14 @@ void iter_npcs(void (*f)(zNPCInstance *, zNPCCommon *)) {
       zNPCInstance *instance = GetInstance(*npc_mgr_instance, npc_type, i);
       zNPCCommon *common = GetData(instance);
 
-      /* if (!ShouldHaveData(instance) || common == NULL) */
-      /*   continue; */
-
       if (common == NULL)
         continue;
 
       f(instance, common);
     }
   }
+}
+
+bool should_have_data(zNPCInstance *a, zNPCCommon *b) {
+  return ShouldHaveData(a) && b != NULL;
 }

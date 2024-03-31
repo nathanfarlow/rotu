@@ -30,10 +30,12 @@ void draw_marker(zNPCInstance *a, zNPCCommon *npc) {
   xVec3 *v = xEntGetPos(npc);
   xVec3 screen;
   float f = world_to_screen(&screen, v);
-  if (f < 0 || f > 1)
+  if (f <= 0 || f >= 1 || !should_have_data(a, npc))
     return;
 
-  draw_text("X", screen.x, screen.y, 0.5f, 0xFF00FFFF, 0);
+  float scale = f * 10;
+
+  draw_text("X", screen.x, screen.y, scale, 0xFF00FFFF, 0);
 }
 
 void end_of_render() { iter_npcs(draw_marker); }

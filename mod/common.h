@@ -4,6 +4,8 @@
 #define u32 unsigned int
 #define u8 unsigned char
 #define bool u8
+#define true 1
+#define false 0
 
 #define sinf ((float (*)(float))0x8007d7f0)
 #define cosf ((float (*)(float))0x8007d834)

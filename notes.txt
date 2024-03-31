@@ -58,3 +58,7 @@ type 2 is enforcer
 type 3 is chimken
 
 type 5 is ground shooter guy
+
+
+FaceToCameraAt
+zCamGetMatrix

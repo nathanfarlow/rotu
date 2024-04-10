@@ -13,10 +13,12 @@ void freeze_npc(zNPCInstance *a, zNPCCommon *npc) {
 }
 
 void (*CheatLevelLocksmith)() = (void *)0x80091f5c;
+bool *dev_cheats_enabled = (bool *)0x803988ed;
 
 /** Gets called at the start of while loop in void Global::zGameLoop(void)
  */
 void game_loop_hook() {
+  /* *dev_cheats_enabled = true; */
   CheatLevelLocksmith();
   /* iter_npcs(freeze_npc); */
 #ifdef HEAD_MOD

@@ -41,3 +41,10 @@ swap cclr:
 
 swap ccud:
 42222224
+
+Enable dev mode:
+003988ed 00000001
+
+L+R+dpad down to fly
+L+R+X to enable debug overlay
+Unlocks all cheat codes
